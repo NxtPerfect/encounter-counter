@@ -1,1 +1,1 @@
-python -m main
+python -m src.tests.test

@@ -14,8 +14,19 @@ def test_window_initializes():
         return
     print("==Passed==")
 
-def run():
+def test_gui():
+    tests = [test_window_initializes]
+    passed: int = 0
+    for test in tests:
+        try:
+            test()
+        except:
+            continue
+        else:
+            passed += 1
+    print(f"Passed {passed} out of {len(tests)}")
     test_window_initializes()
 
 if __name__ == "__main__":
-    run()
+    print("Testing gui")
+    test_gui()
