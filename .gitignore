@@ -1,2 +1,7 @@
 TODO.md
+*.spec
 venv/
+dist/
+build/
+__pycache__/
+assets/
