@@ -1,8 +1,10 @@
 import tkinter as tk
 from tkinter import ttk
 
-PNG_ICON_PATH = "assets/icon.png"
-ICO_ICON_PATH = "assets/icon.ico"
+from src.constants import SRC_ROOT_DIR
+
+PNG_ICON_PATH = SRC_ROOT_DIR + "/../assets/icon.png"
+ICO_ICON_PATH = SRC_ROOT_DIR + "/../assets/icon.ico"
 
 class Gui(tk.Tk):
     window: tk.Tk
@@ -11,7 +13,7 @@ class Gui(tk.Tk):
     count: int
     countVar: tk.IntVar
 
-    def __init__(self, width:int=400, height:int=200, count:int=0):
+    def __init__(self, width:int = 400, height:int = 200, count:int = 0):
         self.window = tk.Tk()
         self.window.title("Encounter Counter")
 
@@ -67,7 +69,7 @@ class Gui(tk.Tk):
         try:
             self.window.iconbitmap(ICO_ICON_PATH)
         except:
-            photo = tk.Image("photo", file=PNG_ICON_PATH)
+            photo = tk.Image("photo", file=PNG_ICON_PATH, master=self.window)
             self.window.wm_iconphoto(True, photo)
             self.window.tk.call('wm','iconphoto',self.window._w,photo)
 
@@ -75,11 +77,18 @@ class Gui(tk.Tk):
         print(event.keysym)
         
         if event.keysym == "equal":
-            self.countVar.set(self.countVar.get() + 1)
+            self.incrementEncounters()
         elif event.keysym == "minus":
-            self.countVar.set(self.countVar.get() - 1 if self.countVar.get() > 0 else 0)
+            self.decrementEncounters()
         print(self.countVar.get())
-        self.window.update_idletasks()
+
+    def incrementEncounters(self, count:int = 1):
+        curValue = self.countVar.get()
+        self.countVar.set(curValue + count)
+
+    def decrementEncounters(self, count:int = 1):
+        curValue = self.countVar.get()
+        self.countVar.set(curValue - count if curValue > 0 else 0)
 
 
     def show(self):
