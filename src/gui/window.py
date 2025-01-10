@@ -31,19 +31,10 @@ class Gui(tk.Tk):
 
         self.setGrid()
         self.setTopMenu()
+        self.setKeybinds()
         self.setCountLabel(count)
 
         self.setIcon()
-
-        # set default keybinds
-        self.experimentalTextRecognition = tk.IntVar()
-        self.experimentalTextRecognition.set(0)
-        self.keySingle = tk.StringVar()
-        self.keySingle.set("f")
-        self.keyHordeOfThree = tk.StringVar()
-        self.keyHordeOfThree.set("g")
-        self.keyHordeOfFive = tk.StringVar()
-        self.keyHordeOfFive.set("h")
 
         # Transparency
         self.window.attributes('-alpha', 0.9)
@@ -89,10 +80,20 @@ class Gui(tk.Tk):
             self.window.wm_iconphoto(True, photo)
             self.window.tk.call('wm','iconphoto',self.window._w,photo)
 
+    def setKeybinds(self):
+        # set default keybinds
+        self.experimentalTextRecognition = tk.IntVar()
+        self.experimentalTextRecognition.set(0)
+        self.keySingle = tk.StringVar()
+        self.keySingle.set("f")
+        self.keyHordeOfThree = tk.StringVar()
+        self.keyHordeOfThree.set("g")
+        self.keyHordeOfFive = tk.StringVar()
+        self.keyHordeOfFive.set("h")
+
     def handleKeys(self, event):
         print(event.keysym)
-        
-        # if keysym == single etc.
+
         if event.keysym == self.keySingle.get():
             self.incrementEncounters()
         elif event.keysym == "i":
@@ -141,7 +142,23 @@ class Gui(tk.Tk):
         singleEncounterEntry = ttk.Entry(newWindow, textvariable=self.keySingle, width=200)
         singleEncounterEntry.pack()
 
+        threeEncounterKeyLabel = ttk.Label(newWindow, text="Triple encounter key:")
+        threeEncounterKeyLabel.pack()
+
+        threeEncounterEntry = ttk.Entry(newWindow, textvariable=self.keyHordeOfThree, width=200)
+        threeEncounterEntry.pack()
+
+        fiveEncounterKeyLabel = ttk.Label(newWindow, text="Five encounters key:")
+        fiveEncounterKeyLabel.pack()
+
+        fiveEncounterEntry = ttk.Entry(newWindow, textvariable=self.keyHordeOfFive, width=200)
+        fiveEncounterEntry.pack()
+
         newWindow.mainloop()
+
+    def getLastKeyForKeybind(self, entryText):
+        if (len(entryText.get()) > 0):
+            entryText.set(entryText.get()[:-1])
 
     def show(self):
         try:
