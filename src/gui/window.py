@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import StringVar, ttk
 
 from src.constants import SRC_ROOT_DIR
 
@@ -12,8 +12,12 @@ class Gui(tk.Tk):
     windowHeight: int
     count: int
     countVar: tk.IntVar
+    experimentalTextRecognition: tk.IntVar # 0 = false, 1 = true
+    keySingle: tk.StringVar
+    keyHordeOfThree: tk.StringVar
+    keyHordeOfFive: tk.StringVar
 
-    def __init__(self, width:int = 400, height:int = 200, count:int = 0):
+    def __init__(self, width:int = 400, height:int = 200, count:int = 0) -> None:
         self.window = tk.Tk()
         self.window.title("Encounter Counter")
 
@@ -30,6 +34,16 @@ class Gui(tk.Tk):
         self.setCountLabel(count)
 
         self.setIcon()
+
+        # set default keybinds
+        self.experimentalTextRecognition = tk.IntVar()
+        self.experimentalTextRecognition.set(0)
+        self.keySingle = tk.StringVar()
+        self.keySingle.set("f")
+        self.keyHordeOfThree = tk.StringVar()
+        self.keyHordeOfThree.set("g")
+        self.keyHordeOfFive = tk.StringVar()
+        self.keyHordeOfFive.set("h")
 
         # Transparency
         self.window.attributes('-alpha', 0.9)
@@ -53,10 +67,12 @@ class Gui(tk.Tk):
         self.window.rowconfigure(1, weight=10)
 
     def setTopMenu(self):
-        self.stats = ttk.Button(self.window, width="", text="Stats")
-        self.stats.grid(column=0, row=0, sticky='nw')
-        self.settings = ttk.Button(self.window, width="", text="Settings")
-        self.settings.grid(column=1, row=0, sticky='nw')
+        self.stats = ttk.Button(self.window, width="", text="Stats", command=self.showStats)
+        self.stats.grid(column=0, row=0, sticky='n')
+        self.settings = ttk.Button(self.window, width="", text="Settings", command=self.showSettings)
+        self.settings.grid(column=1, row=0, sticky='n')
+        self.exit = ttk.Button(self.window, width="", text="Exit", command=self.closeApp)
+        self.exit.grid(column=2, row=0, sticky='n')
 
     def setCountLabel(self, count):
         self.countVar = tk.IntVar()
@@ -76,10 +92,19 @@ class Gui(tk.Tk):
     def handleKeys(self, event):
         print(event.keysym)
         
-        if event.keysym == "equal":
+        # if keysym == single etc.
+        if event.keysym == self.keySingle.get():
             self.incrementEncounters()
-        elif event.keysym == "minus":
+        elif event.keysym == "i":
             self.decrementEncounters()
+        elif event.keysym == self.keyHordeOfThree.get():
+            self.incrementEncounters(3)
+        elif event.keysym == "o":
+            self.decrementEncounters(3)
+        elif event.keysym == self.keyHordeOfFive.get():
+            self.incrementEncounters(5)
+        elif event.keysym == "p":
+            self.decrementEncounters(5)
         print(self.countVar.get())
 
     def incrementEncounters(self, count:int = 1):
@@ -88,12 +113,39 @@ class Gui(tk.Tk):
 
     def decrementEncounters(self, count:int = 1):
         curValue = self.countVar.get()
-        self.countVar.set(curValue - count if curValue > 0 else 0)
+        self.countVar.set(curValue - count if curValue - count >= 0 else 0)
 
+    def closeApp(self):
+        try:
+            self.window.destroy()
+        except Exception as e:
+            print("Failed to close window")
+            print(e)
+
+    def showStats(self):
+        pass
+
+    def showSettings(self):
+        newWindow = tk.Toplevel()
+        newWindow.geometry(f"{self.windowWidth}x{self.windowHeight}")
+
+        # labelExperimentalTextRecognition = ttk.Label(newWindow, text="Set experimental text recognition")
+        # labelExperimentalTextRecognition.pack()
+        #
+        # checkboxExperimentalTextRecognition = ttk.Checkbutton(newWindow, variable=self.experimentalTextRecognition, text="Set experimental text recognition", onvalue=1, offvalue=0, width=20)
+        # checkboxExperimentalTextRecognition.pack()
+
+        singleEncounterKeyLabel = ttk.Label(newWindow, text="Single encounter key:")
+        singleEncounterKeyLabel.pack()
+
+        singleEncounterEntry = ttk.Entry(newWindow, textvariable=self.keySingle, width=200)
+        singleEncounterEntry.pack()
+
+        newWindow.mainloop()
 
     def show(self):
         try:
-            from ctypes import windll
-            windll.shcore.SetProcessDpiAwareness(1)
+            import ctypes
+            ctypes.windll.shcore.SetProcessDpiAwareness(1)
         finally:
             self.window.mainloop()

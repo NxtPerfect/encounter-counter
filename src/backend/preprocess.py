@@ -4,12 +4,23 @@ import numpy as np
 import pytesseract as pytes
 from pytesseract import Output
 from src.constants import SRC_ROOT_DIR
+from PIL import Image
+from pathlib import Path
 
-def preprocessImage(imagePathOg:str = SRC_ROOT_DIR + "/../assets/test.png"):
+"""
+Frist i should upscale the image, with 1080p monitor height, the font
+is about 14pixels high, while it should be no less than 20
+"""
+def preprocessImage(imagesPath:str = SRC_ROOT_DIR + "/../assets/"):
     imagePaths = ["testSingle.png", "testSingle2.jpg", "testSingle3.jpg", "testMultipleShiny.png", "testMultipleShinyMobile.jpg", "testMultipleShinyMobile2.png"]
     for imagePath in imagePaths:
-        image = cv2.imread(SRC_ROOT_DIR + f"/../assets/{imagePath}")
-        im = grayscale(image)
+        preresizedImagePath = Path(SRC_ROOT_DIR + f"/../assets/{imagePath}")
+        resizedImagePath = Path(SRC_ROOT_DIR + f"/../assets/resized{imagePath}")
+        if (not resizedImagePath.is_file()):
+            image = Image.open(preresizedImagePath)
+            im = upscale(image)
+        image = cv2.imread(resizedImagePath)
+        im = canny(erode(thresholding(grayscale(image))))
 
         pokemonNameAndLevelPattern = r'^(\w+)\sLv\.\s\d{1,3}'
 
@@ -38,6 +49,18 @@ def preprocessImage(imagePathOg:str = SRC_ROOT_DIR + "/../assets/test.png"):
 
         custom_config = r'-l eng --oem 3 --psm 6'
         print(pytes.image_to_string(img, config=custom_config))
+
+def upscale(image):
+    pass
+    base_width = 4096
+    wpercent = (base_width / float(image.size[0]))
+    hsize = int((float(image.size[1]) * float(wpercent)))
+    img = image.resize((base_width, hsize), Image.Resampling.LANCZOS)
+    if image.format in ["JPEG", "JPG"]:
+        img.save(f"assets/resized{image.filename.split('/')[-1]}", "JPEG")
+        return img
+    img.save(f"assets/resized{image.filename.split('/')[-1]}")
+    return img
 
 def grayscale(image):
     return cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
