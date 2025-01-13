@@ -19,10 +19,10 @@ def preprocessImage(imagesPath:str = SRC_ROOT_DIR + "/../assets/"):
         if (not resizedImagePath.is_file()):
             image = Image.open(preresizedImagePath)
             im = upscale(image)
-        image = cv2.imread(resizedImagePath)
-        im = canny(erode(thresholding(grayscale(image))))
+        im = cv2.imread(resizedImagePath)
+        # im = canny(erode(thresholding(grayscale(image))))
 
-        pokemonNameAndLevelPattern = r'^(\w+)\sLv\.\s\d{1,3}'
+        pokemonNameAndLevelPattern = r'^(\w+)\s\w{2}\.\s\d{1,3}'
 
         h, *args = im.shape
         boxes = pytes.image_to_boxes(im)
@@ -47,8 +47,10 @@ def preprocessImage(imagesPath:str = SRC_ROOT_DIR + "/../assets/"):
         cv2.imshow('img', img)
         cv2.waitKey(0)
 
-        custom_config = r'-l eng --oem 3 --psm 6'
-        print(pytes.image_to_string(img, config=custom_config))
+        # 6, 11, 12
+        for psm in range(6, 13+1):
+            custom_config = rf'-l eng --oem 3 --psm {psm}'
+            print(f"psm: {psm} {pytes.image_to_string(img, config=custom_config)}")
 
 def upscale(image):
     pass

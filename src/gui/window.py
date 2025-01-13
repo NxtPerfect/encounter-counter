@@ -139,19 +139,25 @@ class Gui(tk.Tk):
         singleEncounterKeyLabel = ttk.Label(newWindow, text="Single encounter key:")
         singleEncounterKeyLabel.pack()
 
-        singleEncounterEntry = ttk.Entry(newWindow, textvariable=self.keySingle, width=200)
+        singleValidate = (self.register(self.getLastKeyForKeybind), "%P")
+
+        singleEncounterEntry = ttk.Entry(newWindow, textvariable=self.keySingle, validate="key", validatecommand=singleValidate, width=200)
         singleEncounterEntry.pack()
+
+        threeValidate = (self.register(self.getLastKeyForKeybind), "%P")
 
         threeEncounterKeyLabel = ttk.Label(newWindow, text="Triple encounter key:")
         threeEncounterKeyLabel.pack()
 
-        threeEncounterEntry = ttk.Entry(newWindow, textvariable=self.keyHordeOfThree, width=200)
+        threeEncounterEntry = ttk.Entry(newWindow, textvariable=self.keyHordeOfThree, validate="key", validatecommand=threeValidate, width=200)
         threeEncounterEntry.pack()
+
+        fiveValidate = (self.register(self.getLastKeyForKeybind), "%P")
 
         fiveEncounterKeyLabel = ttk.Label(newWindow, text="Five encounters key:")
         fiveEncounterKeyLabel.pack()
 
-        fiveEncounterEntry = ttk.Entry(newWindow, textvariable=self.keyHordeOfFive, width=200)
+        fiveEncounterEntry = ttk.Entry(newWindow, textvariable=self.keyHordeOfFive, validate="key", validatecommand=fiveValidate, width=200)
         fiveEncounterEntry.pack()
 
         newWindow.mainloop()
@@ -159,6 +165,8 @@ class Gui(tk.Tk):
     def getLastKeyForKeybind(self, entryText):
         if (len(entryText.get()) > 0):
             entryText.set(entryText.get()[:-1])
+            return True
+        return False
 
     def show(self):
         try:
@@ -166,3 +174,7 @@ class Gui(tk.Tk):
             ctypes.windll.shcore.SetProcessDpiAwareness(1)
         finally:
             self.window.mainloop()
+
+
+if __name__ == "__main__":
+    Gui().show()
