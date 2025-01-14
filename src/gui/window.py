@@ -29,6 +29,8 @@ class Gui(tk.Tk):
 
         self.setWindowDimensionsAndCenter()
 
+        self.setTheme()
+
         self.setGrid()
         self.setTopMenu()
         self.setKeybinds()
@@ -51,6 +53,10 @@ class Gui(tk.Tk):
         self.window.minsize(300, 150)
         self.window.maxsize(screenWidth, screenHeight)
         self.window.geometry(f'{self.windowWidth}x{self.windowHeight}+{centerX}+{centerY}')
+
+    def setTheme(self):
+        style = ttk.Style()
+        style.theme_use('clam')
 
     def setGrid(self):
         self.window.columnconfigure(0, weight=1)
@@ -129,36 +135,38 @@ class Gui(tk.Tk):
     def showSettings(self):
         newWindow = tk.Toplevel()
         newWindow.geometry(f"{self.windowWidth}x{self.windowHeight}")
+        frame = tk.Frame(newWindow)
+        frame.pack(fill=tk.X)
 
-        # labelExperimentalTextRecognition = ttk.Label(newWindow, text="Set experimental text recognition")
-        # labelExperimentalTextRecognition.pack()
-        #
-        # checkboxExperimentalTextRecognition = ttk.Checkbutton(newWindow, variable=self.experimentalTextRecognition, text="Set experimental text recognition", onvalue=1, offvalue=0, width=20)
-        # checkboxExperimentalTextRecognition.pack()
+        checkboxExperimentalTextRecognition = ttk.Checkbutton(newWindow, variable=self.experimentalTextRecognition, text="Experimental text recognition", onvalue=1, offvalue=0)
+        checkboxExperimentalTextRecognition.pack(expand=True)
 
-        singleEncounterKeyLabel = ttk.Label(newWindow, text="Single encounter key:")
+        singleEncounterKeyLabel = ttk.Label(frame, text="Single encounter key:")
         singleEncounterKeyLabel.pack()
 
-        singleValidate = (self.register(self.getLastKeyForKeybind), "%P")
+        # singleValidate = (self.register(self.getLastKeyForKeybind), "%P")
 
-        singleEncounterEntry = ttk.Entry(newWindow, textvariable=self.keySingle, validate="key", validatecommand=singleValidate, width=200)
-        singleEncounterEntry.pack()
+        singleEncounterEntry = ttk.Entry(frame, textvariable=self.keySingle, validate="key")
+        singleEncounterEntry.pack(expand=True)
 
-        threeValidate = (self.register(self.getLastKeyForKeybind), "%P")
-
-        threeEncounterKeyLabel = ttk.Label(newWindow, text="Triple encounter key:")
+        threeEncounterKeyLabel = ttk.Label(frame, text="Triple encounter key:")
         threeEncounterKeyLabel.pack()
 
-        threeEncounterEntry = ttk.Entry(newWindow, textvariable=self.keyHordeOfThree, validate="key", validatecommand=threeValidate, width=200)
-        threeEncounterEntry.pack()
+        # threeValidate = (self.register(self.getLastKeyForKeybind), "%P")
 
-        fiveValidate = (self.register(self.getLastKeyForKeybind), "%P")
+        threeEncounterEntry = ttk.Entry(frame, textvariable=self.keyHordeOfThree, validate="key")
+        threeEncounterEntry.pack(expand=True)
 
-        fiveEncounterKeyLabel = ttk.Label(newWindow, text="Five encounters key:")
+        fiveEncounterKeyLabel = ttk.Label(frame, text="Five encounters key:")
         fiveEncounterKeyLabel.pack()
 
-        fiveEncounterEntry = ttk.Entry(newWindow, textvariable=self.keyHordeOfFive, validate="key", validatecommand=fiveValidate, width=200)
-        fiveEncounterEntry.pack()
+        # fiveValidate = (self.register(self.getLastKeyForKeybind), "%P")
+
+        fiveEncounterEntry = ttk.Entry(frame, textvariable=self.keyHordeOfFive, validate="key")
+        fiveEncounterEntry.pack(expand=True)
+
+        closeSettings = ttk.Button(frame, command=newWindow.destroy, text="Close settings")
+        closeSettings.pack(expand=True)
 
         newWindow.mainloop()
 
