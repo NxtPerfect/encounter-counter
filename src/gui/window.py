@@ -92,10 +92,19 @@ class Gui(tk.Tk):
         self.experimentalTextRecognition.set(0)
         self.keySingle = tk.StringVar()
         self.keySingle.set("f")
+        self.keySingle.trace_add('write', self.getLastKeyForKeybind)
         self.keyHordeOfThree = tk.StringVar()
         self.keyHordeOfThree.set("g")
+        self.keyHordeOfThree.trace_add('write', self.getLastKeyForKeybind)
         self.keyHordeOfFive = tk.StringVar()
         self.keyHordeOfFive.set("h")
+        self.keyHordeOfFive.trace_add('write', self.getLastKeyForKeybind)
+
+    def getLastKeyForKeybind(self, *args):
+        textVariables = [self.keySingle, self.keyHordeOfThree, self.keyHordeOfFive]
+        for text in textVariables:
+            if (len(text.get()) > 1):
+                text.set(text.get()[-1:])
 
     def handleKeys(self, event):
         print(event.keysym)
@@ -133,48 +142,55 @@ class Gui(tk.Tk):
         pass
 
     def showSettings(self):
-        newWindow = tk.Toplevel()
-        newWindow.geometry(f"{self.windowWidth}x{self.windowHeight}")
-        frame = tk.Frame(newWindow)
-        frame.pack(fill=tk.X)
+        self.setSettingsWindow()
+        
+        self.setExperimentalOptions()
+        self.setKeybindOptions()
+        self.setCloseButton()
 
-        checkboxExperimentalTextRecognition = ttk.Checkbutton(newWindow, variable=self.experimentalTextRecognition, text="Experimental text recognition", onvalue=1, offvalue=0)
+        self.newWindow.mainloop()
+    
+    def setSettingsWindow(self):
+        self.newWindow = tk.Toplevel()
+        self.newWindow.geometry(f"{self.windowWidth}x{self.windowHeight}")
+    
+    def setExperimentalOptions(self):
+        checkboxExperimentalTextRecognition = ttk.Checkbutton(self.newWindow, variable=self.experimentalTextRecognition,
+        text="Experimental text recognition", onvalue=1, offvalue=0)
         checkboxExperimentalTextRecognition.pack(expand=True)
 
-        singleEncounterKeyLabel = ttk.Label(frame, text="Single encounter key:")
+    def setKeybindOptions(self):
+        singleEncounterKeyLabel = ttk.Label(self.newWindow, text="Single encounter key:")
         singleEncounterKeyLabel.pack()
 
-        # singleValidate = (self.register(self.getLastKeyForKeybind), "%P")
+        singleValidate = (self.window.register(self.isNotSpecialCharacter), '%S')
 
-        singleEncounterEntry = ttk.Entry(frame, textvariable=self.keySingle, validate="key")
+        singleEncounterEntry = ttk.Entry(self.newWindow, textvariable=self.keySingle, validatecommand=singleValidate, validate="all")
         singleEncounterEntry.pack(expand=True)
 
-        threeEncounterKeyLabel = ttk.Label(frame, text="Triple encounter key:")
+        threeEncounterKeyLabel = ttk.Label(self.newWindow, text="Triple encounter key:")
         threeEncounterKeyLabel.pack()
 
-        # threeValidate = (self.register(self.getLastKeyForKeybind), "%P")
+        threeValidate = (self.window.register(self.isNotSpecialCharacter), '%S')
 
-        threeEncounterEntry = ttk.Entry(frame, textvariable=self.keyHordeOfThree, validate="key")
+        threeEncounterEntry = ttk.Entry(self.newWindow, textvariable=self.keyHordeOfThree, validatecommand=threeValidate, validate="all")
         threeEncounterEntry.pack(expand=True)
 
-        fiveEncounterKeyLabel = ttk.Label(frame, text="Five encounters key:")
+        fiveEncounterKeyLabel = ttk.Label(self.newWindow, text="Five encounters key:")
         fiveEncounterKeyLabel.pack()
 
-        # fiveValidate = (self.register(self.getLastKeyForKeybind), "%P")
+        fiveValidate = (self.window.register(self.isNotSpecialCharacter), '%S')
 
-        fiveEncounterEntry = ttk.Entry(frame, textvariable=self.keyHordeOfFive, validate="key")
+        fiveEncounterEntry = ttk.Entry(self.newWindow, textvariable=self.keyHordeOfFive, validatecommand=fiveValidate, validate="all")
         fiveEncounterEntry.pack(expand=True)
 
-        closeSettings = ttk.Button(frame, command=newWindow.destroy, text="Close settings")
+    def isNotSpecialCharacter(self, input: str) -> bool:
+        print(any(c.isalnum() for c in input))
+        return any(c.isalnum() for c in input) 
+
+    def setCloseButton(self):
+        closeSettings = ttk.Button(self.newWindow, command=self.newWindow.destroy, text="Close settings")
         closeSettings.pack(expand=True)
-
-        newWindow.mainloop()
-
-    def getLastKeyForKeybind(self, entryText):
-        if (len(entryText.get()) > 0):
-            entryText.set(entryText.get()[:-1])
-            return True
-        return False
 
     def show(self):
         try:
